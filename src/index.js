@@ -101,25 +101,7 @@ function Monthly({data}) {
 }
 
 function ChartJSBar({data}) {
-    if ({data}) {
-        const labels = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-        ];
-        const chart_data = {
-            labels: labels,
-            datasets: [{
-                label: 'My First dataset',
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 99, 132)',
-                data: [0, 10, 5, 2, 20, 30, 45],
-                }]
-        };
-        
+    if ({data}) {        
         ChartJS.register(
             CategoryScale,
             LinearScale,
@@ -177,7 +159,6 @@ function CurrentDog({data}) {
             <>
                 <Row>
                     <Alert variant="success">{data.dogname} is Dog of the Hour!</Alert>
-                    <span className="doth-current-hour">{data.date}</span>
                 </Row>
             </>
         );
