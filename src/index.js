@@ -33,8 +33,8 @@ class DothDashboard extends React.Component {
         super(props);
         this.state = {};
         /* URL for API requests */
-        //this.apiUrl = 'http://127.0.0.1:5000/all-views'
-        this.apiUrl = 'https://dogofthehour.johnheaven.eu/api/all-views'
+        this.apiUrl = 'http://127.0.0.1:5000/all-views'
+        //this.apiUrl = 'https://dogofthehour.johnheaven.eu/api/all-views'
 
     }
 
@@ -50,15 +50,18 @@ class DothDashboard extends React.Component {
         if (this.state.allData)
             return (
                 <>
-                <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
+                <Navbar bg="dark" variant="dark" expand="lg" sticky="top" className="site-header">
                     <Container>
                         <Stack gap={5}>
-                            <Navbar.Brand href="#home"><h1>Dog of the Hour</h1></Navbar.Brand>
+                            <Navbar.Brand href="#home">
+                            <h1>Dog of the Hour</h1>
+                            <em>Cometh the hour, cometh the dog</em>
+                            </Navbar.Brand>
                         </Stack>
                     </Container>
                 </Navbar>
-                <Container className="pt-3">
-                    <Stack gap={5}>
+                <Container className="pt-5">
+                    <Stack gap={3}>
                         <Row>
                             <section className="current-dog">
                                 <CurrentDog data={this.state.allData.current_dog} />
@@ -158,7 +161,9 @@ function CurrentDog({data}) {
         return (
             <>
                 <Row>
-                    <Alert variant="success">{data.dogname} is Dog of the Hour!</Alert>
+                    <Col md="auto">
+                        <Alert variant="success"><strong>{data.dogname} is Dog of the Hour!</strong></Alert>
+                    </Col>
                 </Row>
             </>
         );
