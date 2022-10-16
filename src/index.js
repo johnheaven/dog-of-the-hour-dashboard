@@ -32,11 +32,15 @@ class DothDashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
+        /* URL for API requests */
+        //this.apiUrl = 'http://127.0.0.1:5000/all-views'
+        this.apiUrl = 'https://dogofthehour.johnheaven.eu/api/all-views'
+
     }
 
     componentDidMount() {
         // get body data for monthly view
-        axios.get('http://127.0.0.1:5000/all-views')
+        axios.get(this.apiUrl)
         .then(res => {
             this.setState({allData: res.data});
         }).catch(error => {console.error(error)});
