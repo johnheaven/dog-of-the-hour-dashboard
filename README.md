@@ -1,3 +1,13 @@
+# Dog of the Hour Dashboard
+
+This is a fun project - see (https://dogofthehour.net). This repository is just the dashboard part, i.e. a React app that pulls in the JSON data and displays it. I'm a React beginner (hence all the React cruft that's in this repository), but using Bootstrap makes a nice-looking end result.
+
+The data gets pulled in from a simple API that I created with Flask. So the workflow is:
+
+Cron job with data logger generates dogs of hour -> Flask app (Python) does some preprocessing and exposes as JSON API -> React app displays it.
+
+Currently the Flask app and React apps are running in Docker containers on a virtual server.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
