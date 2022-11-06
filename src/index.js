@@ -30,7 +30,7 @@ import { Bar } from 'react-chartjs-2';
 /* URL for API requests */
 
 //const apiUrl = '//127.0.0.1:5000/all-views'
-const apiUrl = 'https://dogofthehour.net/api/all-views'
+const apiUrl = '/api/all-views'
 
 /* Main app */
 class DothDashboard extends React.Component {
