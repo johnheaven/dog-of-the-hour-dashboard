@@ -29,8 +29,8 @@ import { Bar } from 'react-chartjs-2';
 
 /* URL for API requests */
 
-//const apiUrl = '//127.0.0.1:5000/all-views'
-const apiUrl = '/api/all-views'
+const apiUrl = 'http://127.0.0.1:5000/all-views'
+//const apiUrl = '/api/all-views'
 
 /* Main app */
 class DothDashboard extends React.Component {
@@ -79,6 +79,11 @@ class DothDashboard extends React.Component {
                             </section>
                         </Row>
                         <Row>
+                            <section className="yearly">
+                                <Yearly data={this.state.allData.yearly} />
+                            </section>
+                        </Row>
+                        <Row>
                             <section className="leaderboard">
                                 <RunsLeaderboard data={this.state.allData.runs_by_month} />
                             </section>
@@ -98,6 +103,17 @@ function Monthly({data}) {
         return (
         <>
         <BsTable tableData={data.table} title='Monthly Standings' />
+        <ChartJSBar data={data.chart} />
+        </>
+        );
+    }
+}
+
+function Yearly({data}) {
+    if (data) {
+        return (
+        <>
+        <BsTable tableData={data.table} title='Yearly Standings' />
         <ChartJSBar data={data.chart} />
         </>
         );
