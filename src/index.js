@@ -19,7 +19,7 @@ import Plot from 'react-plotly.js'
 
 /* URL for API requests */
 
-const apiUrl = process.env.NODE_ENV == 'production' ? '/api/all-views' : 'http://127.0.0.1:5000/all-views';
+const apiUrl = process.env.NODE_ENV === 'production' ? '/api/all-views?months=12' : 'http://127.0.0.1:5000/all-views?months=12';
 
 /* Main app */
 class DothDashboard extends React.Component {
@@ -92,7 +92,7 @@ class DothDashboard extends React.Component {
 
 function Monthly({data}) {
     if (data) {
-        const [rows, dates, dogNames] = colsToRows(data)
+        const [rows, dates, _] = colsToRows(data)
         const [y, x, legend] = colsToRows(data, false)
         return (
         <>
@@ -100,6 +100,61 @@ function Monthly({data}) {
         <PlotlyBar names={legend} x={x} y={y} />
         </>
         );
+    }
+
+}
+    
+    function Yearly({data}) {
+        if (data) {
+            const [rows, dates] = colsToRows(data)
+            const [y, x, legend] = colsToRows(data, false)
+            return (
+                <>
+        <BsTable headings={Array.of('', ...dates)} tableData={rows} title='Yearly Standings' />
+        <PlotlyBar names={legend} x={x} y={y} />
+        </>
+        );
+    }
+}
+
+function CurrentDog({data}) {
+    if (data) {
+        return (
+            <>
+                <Row>
+                    <Col md="auto">
+                        <Alert variant="success"><strong>{data.dogname} is Dog of the Hour!</strong></Alert>
+                    </Col>
+                </Row>
+            </>
+        );
+    }
+
+}
+
+function TodaysDogs({data}) {
+    if (data) {
+        return (
+            <BsTable tableData={Array.of(Object.values(data.dogname))} headings={Object.values(data.hour)} title={"Today's Winners"} />
+        )
+    }
+}
+
+function RunsLeaderboard({data}) {
+    if (data) {
+        var [names, headings] = colsToRows(data)
+        var [y, _, legend] = colsToRows(data, false)
+        // preprocess headings
+        headings = headings.map(heading => {return heading.replace('run_', 'Runs of ')})
+        // add empty column
+        const table_headings = ['', ...headings]
+
+        return (
+            <>
+            <BsTable headings={table_headings} tableData={names} title={'Runs Leaderboard'} />
+            <PlotlyBar names={legend} x={headings} y={y} />
+            </>
+        )
     }
 }
 
@@ -109,38 +164,26 @@ function colsToRows(cols, addIndex=true) {
     // just need keys from one of the objects as they're all the same
     let dogNames = Object.keys(cols[dates[0]])
     // get rows from cols
-    let rows = Array()
-    dogNames.map(dogName => {
+    let rows = []
+    dogNames.forEach(dogName => {
         // add item and get index of last item
-        let last_index = rows.push(Array()) - 1
+        let last_index = rows.push([]) - 1
         if (addIndex) rows[last_index].push(dogName)
-        dates.map(date => {
-            rows[last_index].push(cols[date][dogName])
+        dates.forEach(date => {
+            return rows[last_index].push(cols[date][dogName])
         })
     })
     return [rows, dates, dogNames]
 }
 
-function Yearly({data}) {
-    if (data) {
-        const [rows, dates] = colsToRows(data)
-        return (
-        <>
-        <BsTable headings={Array.of('', ...dates)} tableData={rows} title='Yearly Standings' />
-        {/*<PlotlyBar data={data} />*/}
-        </>
-        );
-    }
-}
-
 function PlotlyBar({names, x, y}) {
     if ({names} && {x} && {y}) {
-        let plot_data = Array()
-        y.map((y, index) => {
+        let plot_data = []
+        y.forEach((y, index) => {
             plot_data.push({x: x, y: y, name: names[index], type: 'bar'})
         })
         return(
-        <Plot data={plot_data} layout={{xaxis: {type: 'category'}, range: x}} style={{width: '100%'}} />
+        <Plot data={plot_data} layout={{xaxis: {type: 'category'}, range: x}} style={{width: '100%'}} config={{responsive: true}} />
         )
     };
 }
@@ -189,41 +232,6 @@ function BsTable({tableData, headings, title}) {
             </thead>
             </>
         );
-    }
-}
-
-function CurrentDog({data}) {
-    if (data) {
-        return (
-            <>
-                <Row>
-                    <Col md="auto">
-                        <Alert variant="success"><strong>{data.dogname} is Dog of the Hour!</strong></Alert>
-                    </Col>
-                </Row>
-            </>
-        );
-    }
-
-}
-
-function TodaysDogs({data}) {
-    if (data) {
-        return (
-            <BsTable tableData={Array.of(Object.values(data.dogname))} headings={Object.values(data.hour)} title={"Today's Winners"} />
-        )
-    }
-}
-
-function RunsLeaderboard({data}) {
-    if (data) {
-        const [rows, dates] = colsToRows(data)
-        return (
-            <>
-            <BsTable headings={Array.of('', ...dates)} tableData={rows} title={'Runs Leaderboard'} />
-            {/*<PlotlyBar data={data} />*/}
-            </>
-        )
     }
 }
 
