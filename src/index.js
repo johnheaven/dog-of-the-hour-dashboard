@@ -14,23 +14,13 @@ import Stack from 'react-bootstrap/Stack';
 import Navbar from 'react-bootstrap/Navbar';
 import Alert from 'react-bootstrap/Alert';
 
-/* Reactchartjs stuff */
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend
-     } from 'chart.js';
-
-import { Bar } from 'react-chartjs-2';
+/* Plotly */
+import Plot from 'react-plotly.js'
 
 /* URL for API requests */
 
-//const apiUrl = 'http://127.0.0.1:5000/all-views';
-const apiUrl = '/api/all-views';
+const apiUrl = 'http://127.0.0.1:5000/all-views';
+//const apiUrl = '/api/all-views';
 
 /* Main app */
 class DothDashboard extends React.Component {
@@ -48,7 +38,7 @@ class DothDashboard extends React.Component {
     }
 
     render() {
-        if (this.state.allData)
+        if (this.state.allData) {
             return (
                 <>
                 <Navbar bg="dark" variant="dark" expand="lg" sticky="top" className="site-header">
@@ -92,70 +82,86 @@ class DothDashboard extends React.Component {
                 </Container>
                 </>
             );
-        else
+        }
+        else {
+
             return (<h1>Loading...</h1>)
+        }
     }
 
 }
 
 function Monthly({data}) {
     if (data) {
+        const [rows, dates, dogNames] = colsToRows(data)
+        const [y, x, legend] = colsToRows(data, false)
         return (
         <>
-        <BsTable tableData={data.table} title='Monthly Standings' />
-        <ChartJSBar data={data.chart} />
+        <BsTable headings={Array.of('', ...dates)} tableData={rows} title='Monthly Standings' />
+        <PlotlyBar names={legend} x={x} y={y} />
         </>
         );
     }
+}
+
+function colsToRows(cols, addIndex=true) {
+    // need firstcol (index), colnames, and rows
+    let dates = Object.keys(cols)
+    // just need keys from one of the objects as they're all the same
+    let dogNames = Object.keys(cols[dates[0]])
+    // get rows from cols
+    let rows = Array()
+    dogNames.map(dogName => {
+        // add item and get index of last item
+        let last_index = rows.push(Array()) - 1
+        if (addIndex) rows[last_index].push(dogName)
+        dates.map(date => {
+            rows[last_index].push(cols[date][dogName])
+        })
+    })
+    return [rows, dates, dogNames]
 }
 
 function Yearly({data}) {
     if (data) {
+        const [rows, dates] = colsToRows(data)
         return (
         <>
-        <BsTable tableData={data.table} title='Yearly Standings' />
-        <ChartJSBar data={data.chart} />
+        <BsTable headings={Array.of('', ...dates)} tableData={rows} title='Yearly Standings' />
+        {/*<PlotlyBar data={data} />*/}
         </>
         );
     }
 }
 
-function ChartJSBar({data}) {
-    if ({data}) {        
-        ChartJS.register(
-            CategoryScale,
-            LinearScale,
-            BarElement,
-            Title,
-            Tooltip,
-            Legend
-        );
-
+function PlotlyBar({names, x, y}) {
+    if ({names} && {x} && {y}) {
+        let plot_data = Array()
+        y.map((y, index) => {
+            plot_data.push({x: x, y: y, name: names[index], type: 'bar'})
+        })
         return(
-            <Bar data={data} />
-        );
+        <Plot data={plot_data} layout={{xaxis: {type: 'category'}, range: x}} style={{width: '100%'}} />
+        )
     };
 }
 
-function BsTable({tableData, title}) {
-    /* tableData is the rows of the table.
-    An array, each item a row.
-    The first row is assumed to be the header row.
-    title is the heading above the table, i.e. wrapped in <h2> */
+function BsTable({tableData, headings, title}) {
+    
+    let headerHtml = (title === undefined ? '' : getHeaderHtml())
+    function getHeaderHtml() {
+        return(<h2>{title}</h2>)
+    }
 
-    if (tableData && title) {
+    let headingsHtml = (headings === undefined ? '' : tableHeadings())
+
+    if (tableData) {
         return (
             <>
-            <h2>{title}</h2>
+            {headerHtml}
             <Table striped bordered hover responsive>
-                <thead>
-                    <tr>
-                    {tableData.shift().map(heading => {
-                        return (<th key={heading}>{heading}</th>)
-                    })}
-                    </tr>
-                </thead>
-                <tbody>
+                {headingsHtml}
+                {<tbody>
                     {tableData.map(row => {
                         return (
                             <tr>{row.map(cell => {
@@ -166,11 +172,25 @@ function BsTable({tableData, title}) {
                             );}
                         )
                     } 
-                </tbody>
+                </tbody>}
             </Table>
             </>
         )
     };
+    
+    function tableHeadings() {
+        return(
+            <>
+            <thead>
+                <tr>
+                    {headings.map(heading => {
+                    return (<th key={heading}>{heading}</th>)
+                    })}
+                </tr>
+            </thead>
+            </>
+        );
+    }
 }
 
 function CurrentDog({data}) {
@@ -191,17 +211,18 @@ function CurrentDog({data}) {
 function TodaysDogs({data}) {
     if (data) {
         return (
-            <BsTable tableData={data.table} title={"Today's Winners"} />
+            <BsTable tableData={Array.of(Object.values(data.dogname))} headings={Object.values(data.hour)} title={"Today's Winners"} />
         )
     }
 }
 
 function RunsLeaderboard({data}) {
     if (data) {
+        const [rows, dates] = colsToRows(data)
         return (
             <>
-            <BsTable tableData={data.table} title={'Runs Leaderboard'} />
-            <ChartJSBar data={data.chart} />
+            <BsTable headings={Array.of('', ...dates)} tableData={rows} title={'Runs Leaderboard'} />
+            {/*<PlotlyBar data={data} />*/}
             </>
         )
     }
