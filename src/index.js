@@ -29,8 +29,7 @@ import { Bar } from 'react-chartjs-2';
 
 /* URL for API requests */
 
-//const apiUrl = 'http://127.0.0.1:5000/all-views';
-const apiUrl = '/api/all-views';
+const apiUrl = process.env.NODE_ENV == 'production' ? '/api/all-views' : 'http://127.0.0.1:5000/all-views';
 
 /* Main app */
 class DothDashboard extends React.Component {
