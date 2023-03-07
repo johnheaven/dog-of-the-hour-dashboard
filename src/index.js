@@ -63,6 +63,11 @@ class DothDashboard extends React.Component {
                             </section>
                         </Row>
                         <Row>
+                            <section className="past-7-days">
+                                <Past7Days data={this.state.allData.daily} />
+                            </section>
+                        </Row>
+                        <Row>
                             <section className="monthly">
                                 <Monthly data={this.state.allData.monthly} />
                             </section>
@@ -86,6 +91,20 @@ class DothDashboard extends React.Component {
 
             return (<h1>Loading...</h1>)
         }
+    }
+
+}
+
+function Past7Days({data}) {
+    if (data) {
+        const [rows, dates, _] = colsToRows(data)
+        const [y, x, legend] = colsToRows(data, false)
+        return (
+        <>
+        <BsTable headings={Array.of('', ...dates)} tableData={rows} title='Past 7 Days' />
+        <PlotlyBar names={legend} x={x} y={y} />
+        </>
+        );
     }
 
 }
